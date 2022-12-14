@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    
+        $(document).ready(function ()
+        {
+          var latvar;
+    var lngvar;
+            GetData();
+        });
+
+        function GetData()
+        {
+          
+
+            $.ajax
+            ({
+                url: "/get_data",
+                type: 'GET',
+                contentType: "application/json",
+                //dataType: "json",
+                //crossDomain: true,
+                success: function (response, textStatus, xhr) {
+                    console.log(response.data)
+
+                    $.each(response, function (i, item) {
+                        console.log("abccc")
+                        
+                        if (i == 'data') {
+                            console.log(item[1])
+                            // var ubound = item.length;
+                            // $('#txtField1').val(item[ubound - 1].field1);
+                            latvar=  parseFloat(item[1].lat);                        
+                             $('#txtField2').val(item[1].lat);
+                            lngvar=parseFloat(item[ 1].long);
+                             $('#txtField3').val(item[ 1].long);
+                        }
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+
+            setTimeout(GetData, 10000);
+        }
+    </script>
+    <meta http-equiv="refresh" content="32">
+    <title>Simple Map</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script>
+      let map;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 12.9716, lng: 77.5946 },
+          zoom: 13,
+          
+        });
+        var marker = new google.maps.Marker({
+            position:{lat: 12.9344,lng:77.6060},
+            map:map,
+            //icon:"C:\\Users\\sandy\\OneDrive\\Desktop\\Smartize\\green_bin.png",
+            //size: new google.maps.Size(20, 32),
+
+                
+        });
+        var infowin=new google.maps.InfoWindow({
+
+          content:'<h2 >Bin ID : 1308673 </h2><br> <h2>Status</h2><input id="txtField1" type="text" />percent full <br>  <h2>lattitude</h2><input id="txtField2"  type="text" /><br> <h2>longitude</h2>    <input id="txtField3" class="form-field animation a4"  type="text" />     '
+
+        });
+        marker.addListener('click',function(){
+          infowin.open(map,marker);
+        });
+
+       
+      }
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxdIbrCb7IhOv5Feo36x4zK-UfqEV8ZUw&callback=initMap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
