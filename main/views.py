@@ -12,6 +12,8 @@ table = dynamodb.Table(TABLE_NAME)
 def home(request):
     return(render(request, "index.html"))
 
+def index(request):
+    return(render(request,"home.html"))
 
 def getData(request):
     data = table.scan()

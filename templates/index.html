@@ -3,11 +3,12 @@
   <head>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">
-    
+    var latvar;
+    var lngvar;
+    flag=0;
         $(document).ready(function ()
         {
-          var latvar;
-    var lngvar;
+          
             GetData();
         });
 
@@ -31,11 +32,19 @@
                         if (i == 'data') {
                             console.log(item[1])
                             // var ubound = item.length;
-                            // $('#txtField1').val(item[ubound - 1].field1);
-                            latvar=  parseFloat(item[1].lat);                        
-                             $('#txtField2').val(item[1].lat);
-                            lngvar=parseFloat(item[ 1].long);
-                             $('#txtField3').val(item[ 1].long);
+                            $('#txtField1').val(item[3].tid);
+                            latvar=  parseFloat(item[3].lat);                        
+                             $('#txtField2').val(item[3].lat);
+                            lngvar=parseFloat(item[ 3].long);
+                             $('#txtField3').val(item[ 3].long);
+                            position= { lat: latvar, lng: lngvar };
+                            if(flag%10==0)
+                            {
+                              addmarker(position);
+                              flag=1;
+                            }  
+                             flag=flag+1; 
+                             
                         }
                     });
                 },
@@ -45,6 +54,7 @@
             });
 
             setTimeout(GetData, 10000);
+            
         }
     </script>
     <meta http-equiv="refresh" content="32">
@@ -64,38 +74,125 @@
         margin: 0;
         padding: 0;
       }
+      
+#floating-panel {
+  position: absolute;
+  top: 10px;
+  left: 48%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  font-family: "Roboto", "sans-serif";
+  line-height: 30px;
+  padding-left: 10px;
+}
     </style>
     <script>
       let map;
-
+      
+      let markers = [];
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 12.9716, lng: 77.5946 },
           zoom: 13,
           
         });
+        
+       
+
+       
+      }
+
+
+      // Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+  hideMarkers();
+  markers = [];
+}
+// Sets the map on all markers in the array.
+function setMapOnAll(map) {
+  for (let i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function hideMarkers() {
+  setMapOnAll(null);
+}
+      function addmarker(position){
+        deleteMarkers();
+
+        console.log("mark added")
         var marker = new google.maps.Marker({
-            position:{lat: 12.9344,lng:77.6060},
+            position:{lat: latvar,lng:lngvar},
             map:map,
             //icon:"C:\\Users\\sandy\\OneDrive\\Desktop\\Smartize\\green_bin.png",
             //size: new google.maps.Size(20, 32),
 
-                
+            
         });
         var infowin=new google.maps.InfoWindow({
 
-          content:'<h2 >Bin ID : 1308673 </h2><br> <h2>Status</h2><input id="txtField1" type="text" />percent full <br>  <h2>lattitude</h2><input id="txtField2"  type="text" /><br> <h2>longitude</h2>    <input id="txtField3" class="form-field animation a4"  type="text" />     '
+          content:'<h2>Device Id</h2><input id="txtField1" type="text" /><br>  <h2>lattitude</h2><input id="txtField2"  type="text" /><br> <h2>longitude</h2>    <input id="txtField3" class="form-field animation a4"  type="text" />   '
 
         });
         marker.addListener('click',function(){
           infowin.open(map,marker);
         });
+        markers.push(marker);
 
-       
       }
+var l1;
+var l2;
+      function abc() {  
+        if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+l1=position.coords.latitude;
+l2=position.coords.longitude;
+
+          console.log(pos);
+         
+        },
+        () => {
+          handleLocationError(true, infoWindow, map.getCenter());
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation
+      handleLocationError(false, infoWindow, map.getCenter());
+    }
+
+    location.href = "https://www.google.com/maps/dir/?api=1&origin="+l1+"/"+l2+"&destination="+latvar+"/"+lngvar;
+            }
+
+            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(
+    browserHasGeolocation
+      ? "Error: The Geolocation service failed."
+      : "Error: Your browser doesn't support geolocation."
+  )
+
+
+
+            }
+      
+      
+      
     </script>
   </head>
   <body>
+    <div id="floating-panel">
+      <input id="myButton" type="button" onclick="abc()" value="Navigate" />
+    </div>
     <div id="map"></div>
 
     <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
